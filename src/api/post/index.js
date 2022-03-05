@@ -1,15 +1,15 @@
 import { Router } from 'express';
 import * as postCtrl from './post.ctrl.js';
+import checkObjectId from '../../lib/checkObjectId.js';
+import jwtMiddleware from '../../lib/jwtMiddleware.js';
 
 const post = new Router();
 
-post.get('/list', postCtrl.list);
-post.post('/write', postCtrl.write);
-post.get('/read/:id', postCtrl.checkObjectId, postCtrl.read);
-post.delete('/remove/:id', postCtrl.checkObjectId, postCtrl.remove);
-post.patch('/update/:id', postCtrl.checkObjectId, postCtrl.update);
-post.get('/series/:series', postCtrl.series);
-post.get('/getlist', postCtrl.getlist);
-post.get('/backup', postCtrl.backup);
+post.get('/catalog', postCtrl.catalog);
+post.get('/', postCtrl.list);
+post.post('/', jwtMiddleware, postCtrl.write);
+post.get('/:id', checkObjectId, postCtrl.read);
+post.delete('/:id', jwtMiddleware, checkObjectId, postCtrl.remove);
+post.patch('/:id', jwtMiddleware, checkObjectId, postCtrl.update);
 
 export default post;
