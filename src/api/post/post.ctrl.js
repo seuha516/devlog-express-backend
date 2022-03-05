@@ -17,7 +17,7 @@ export const list = async (req, res) => {
       .limit(6)
       .skip((page - 1) * 6)
       .lean()
-      .select('-body -series -project -like -comment -date')
+      .select('-body -series -project -like -comment')
       .exec();
     const postCount = await Post.countDocuments(query);
     const tagData = await Post.find().lean().select('tags').exec();
