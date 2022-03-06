@@ -1,12 +1,12 @@
 import mongoose from 'mongoose';
 
 const { Schema } = mongoose;
-const ImageScehma = new Schema(
+const ImageSchema = new Schema(
   {
     img: Buffer,
   },
   { versionKey: false },
 );
 
-const Image = mongoose.model('image', ImageScehma);
+const Image = mongoose.model('image', ImageSchema);
 export default Image;

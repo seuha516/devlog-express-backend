@@ -31,7 +31,7 @@ app.use(cookieParser());
 app.use('/', api);
 
 const port = process.env.PORT || 4000;
-app.listen(port, () => console.log(`[TEST] Server (port: ${port})`));
+app.listen(port, '0.0.0.0', () => console.log(`[TEST] Server (port: ${port})`));
 // https.createServer(option, app).listen(port, () => console.log(`[HTTPS] Server (port: ${port})`));
 
 export default app;

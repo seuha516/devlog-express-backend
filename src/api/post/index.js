@@ -11,5 +11,8 @@ post.post('/', jwtMiddleware, postCtrl.write);
 post.get('/:id', checkObjectId, postCtrl.read);
 post.delete('/:id', jwtMiddleware, checkObjectId, postCtrl.remove);
 post.patch('/:id', jwtMiddleware, checkObjectId, postCtrl.update);
+post.post('/:id/like', jwtMiddleware, checkObjectId, postCtrl.like);
+post.post('/:id/comment', jwtMiddleware, checkObjectId, postCtrl.writeComment);
+post.delete('/:id/comment', jwtMiddleware, checkObjectId, postCtrl.removeComment);
 
 export default post;

@@ -1,6 +1,45 @@
 import Post from '../../models/Post.js';
 import Project from '../../models/Project.js';
 
+export const catalog = async (req, res) => {
+  try {
+    const titleData = await Project.find().sort({ title: 1 }).lean().select('title').exec();
+    const seriesData = await Post.find().sort({ series: 1 }).lean().select('series').exec();
+    let titleList = [];
+    for (let i = 0; i < titleData.length; i++) {
+      titleList.push(titleData[i].title);
+    }
+    let seriesList = [];
+    for (let i = 0; i < seriesData.length; i++) {
+      let exist = false;
+      for (let j = 0; j < seriesList.length; j++) {
+        if (seriesList[j] === seriesData[i].series) {
+          exist = true;
+          break;
+        }
+      }
+      if (!exist && seriesData[i].series !== '') {
+        seriesList.push(seriesData[i].series);
+      }
+    }
+    const tagData = await Post.find().lean().select('tags').exec();
+    let tagList = {};
+    for (let i = 0; i < tagData.length; i++) {
+      for (let j = 0; j < tagData[i].tags.length; j++) {
+        if (!tagList[tagData[i].tags[j].name]) {
+          tagList[tagData[i].tags[j].name] = tagData[i].tags[j].color;
+        }
+      }
+    }
+    return res.json({
+      titles: titleList,
+      series: seriesList,
+      tags: tagList,
+    });
+  } catch (e) {
+    return res.status(500).json({ message: '오류가 발생했습니다.', error: e });
+  }
+};
 export const list = async (req, res) => {
   const page = parseInt(req.query.page || '1');
   if (page < 1 || isNaN(page)) return res.status(400).json({ message: '페이지 값이 올바르지 않습니다.' });
@@ -97,7 +136,7 @@ export const read = async (req, res) => {
       .limit(1)
       .select('_id title')
       .exec();
-    return res.json({ post, prev, next });
+    return res.json({ post, prev: prev[0] || null, next: next[0] || null });
   } catch (e) {
     return res.status(500).json({ message: '오류가 발생했습니다.', error: e });
   }
@@ -123,37 +162,49 @@ export const update = async (req, res) => {
     return res.status(500).json({ message: '오류가 발생했습니다.', error: e });
   }
 };
-export const catalog = async (req, res) => {
+export const like = async (req, res) => {
+  const { id } = req.params;
   try {
-    const titleList = await Project.find().sort({ title: 1 }).lean().select('_id title').exec();
-    const seriesData = await Post.find().sort({ series: 1 }).lean().select('series').exec();
-    let seriesList = [];
-    for (let i = 0; i < seriesData.length; i++) {
-      let exist = false;
-      for (let j = 0; j < seriesList.length; j++) {
-        if (seriesList[j] === seriesData[i].series) {
-          exist = true;
-          break;
-        }
-      }
-      if (!exist && seriesData[i].series !== '') {
-        seriesList.push(seriesData[i].series);
-      }
+    const post = await Post.findById(id);
+    if (!post) return res.status(404).json({ message: '존재하지 않는 게시물입니다.' });
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    const canLike = await post.pressLike(ip);
+    if (canLike) {
+      await post.save();
+      return res.status(200).json();
+    } else {
+      return res.status(409).json({ message: '이미 좋아요를 눌렀습니다.' });
     }
-    const tagData = await Post.find().lean().select('tags').exec();
-    let tagList = {};
-    for (let i = 0; i < tagData.length; i++) {
-      for (let j = 0; j < tagData[i].tags.length; j++) {
-        if (!tagList[tagData[i].tags[j].name]) {
-          tagList[tagData[i].tags[j].name] = tagData[i].tags[j].color;
-        }
-      }
+  } catch (e) {
+    return res.status(500).json({ message: '오류가 발생했습니다.', error: e });
+  }
+};
+export const writeComment = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const post = await Post.findById(id);
+    if (!post) return res.status(404).json({ message: '존재하지 않는 게시물입니다.' });
+    const { commentId, comment } = req.body;
+    await post.writeComment(commentId, comment);
+    await post.save();
+    return res.status(200).json();
+  } catch (e) {
+    return res.status(500).json({ message: '오류가 발생했습니다.', error: e });
+  }
+};
+export const removeComment = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const post = await Post.findById(id);
+    if (!post) return res.status(404).json({ message: '존재하지 않는 게시물입니다.' });
+    const { commentId, password } = req.body;
+    const canRemove = await post.removeComment(commentId, password);
+    if (canRemove) {
+      await post.save();
+      return res.status(200).json();
+    } else {
+      return res.status(401).json({ message: '비밀번호가 틀렸습니다.' });
     }
-    return res.json({
-      titles: titleList,
-      series: seriesList,
-      tags: tagList,
-    });
   } catch (e) {
     return res.status(500).json({ message: '오류가 발생했습니다.', error: e });
   }

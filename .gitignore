@@ -1,4 +1,4 @@
 node_modules
 .prettierrc
 .env
-.images/*.png
+images/*.png

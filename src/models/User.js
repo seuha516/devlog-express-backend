@@ -3,7 +3,7 @@ import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 const { Schema } = mongoose;
-const UserScehma = new Schema(
+const UserSchema = new Schema(
   {
     username: String,
     hashedPassword: String,
@@ -11,22 +11,22 @@ const UserScehma = new Schema(
   { versionKey: false },
 );
 
-UserScehma.methods.setPassword = async function (password) {
+UserSchema.methods.setPassword = async function (password) {
   const hash = await bcryptjs.hash(password, 10);
   this.hashedPassword = hash;
 };
-UserScehma.methods.checkPassword = async function (password) {
+UserSchema.methods.checkPassword = async function (password) {
   return bcryptjs.compare(password, this.hashedPassword);
 };
-UserScehma.statics.findByUsername = function (username) {
+UserSchema.statics.findByUsername = function (username) {
   return this.findOne({ username });
 };
-UserScehma.methods.serialize = function () {
+UserSchema.methods.serialize = function () {
   const data = this.toJSON();
   delete data.hashedPassword;
   return data;
 };
-UserScehma.methods.generateToken = function () {
+UserSchema.methods.generateToken = function () {
   const token = jwt.sign(
     {
       _id: this._id,
@@ -40,5 +40,5 @@ UserScehma.methods.generateToken = function () {
   return token;
 };
 
-const User = mongoose.model('user', UserScehma);
+const User = mongoose.model('user', UserSchema);
 export default User;
