@@ -51,14 +51,19 @@ export const list = async (req, res) => {
   };
 
   try {
-    const posts = await Post.find(query)
-      .sort({ _id: sort ? parseInt(sort) : -1 })
+    const tempPosts = await Post.find(query)
+      .sort({ _id: sort ? parseInt(sort) : series ? 1 : -1 })
       .limit(6)
       .skip((page - 1) * 6)
       .lean()
       .select('-body -series -project -like -comment')
       .exec();
     const postCount = await Post.countDocuments(query);
+    const posts = series
+      ? tempPosts.map((i, idx) => {
+          return { ...i, seriesNumber: sort == -1 ? postCount - (page - 1) * 6 - idx : (page - 1) * 6 + idx + 1 };
+        })
+      : tempPosts;
     const tagData = await Post.find().lean().select('tags').exec();
     let tagList = [];
     for (let i = 0; i < tagData.length; i++) {
@@ -136,7 +141,7 @@ export const read = async (req, res) => {
       .limit(1)
       .select('_id title')
       .exec();
-    return res.json({ post, prev: prev[0] || null, next: next[0] || null });
+    return res.json({ post: post.serialize(), prev: prev[0] || null, next: next[0] || null });
   } catch (e) {
     return res.status(500).json({ message: '오류가 발생했습니다.', error: e });
   }

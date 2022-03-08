@@ -88,7 +88,7 @@ export const read = async (req, res) => {
     if (!ObjectId.isValid(id)) return res.status(400).json({ message: '올바르지 않은 데이터 ID입니다.' });
     const project = await Project.findById(id);
     if (!project) return res.status(404).json({ message: '존재하지 않는 프로젝트입니다.' });
-    return res.json(project);
+    return res.json(project.serialize());
   } catch (e) {
     return res.status(500).json({ message: '오류가 발생했습니다.', error: e });
   }
