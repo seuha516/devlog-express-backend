@@ -11,8 +11,8 @@ project.post('/', jwtMiddleware, projectCtrl.write);
 project.get('/:id', projectCtrl.read);
 project.delete('/:id', jwtMiddleware, checkObjectId, projectCtrl.remove);
 project.patch('/:id', jwtMiddleware, checkObjectId, projectCtrl.update);
-project.post('/:id/like', jwtMiddleware, checkObjectId, projectCtrl.like);
-project.post('/:id/comment', jwtMiddleware, checkObjectId, projectCtrl.writeComment);
-project.delete('/:id/comment', jwtMiddleware, checkObjectId, projectCtrl.removeComment);
+project.post('/:id/like', checkObjectId, projectCtrl.like);
+project.post('/:id/comment/write', checkObjectId, projectCtrl.writeComment);
+project.post('/:id/comment/remove', checkObjectId, projectCtrl.removeComment);
 
 export default project;
