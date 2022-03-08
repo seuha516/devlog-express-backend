@@ -78,7 +78,8 @@ ProjectSchema.statics.findByTitle = function (title) {
 };
 ProjectSchema.methods.pressLike = async function (ip) {
   for (let i = 0; i < this.like.length; i++) {
-    if (bcryptjs.compare(ip, this.like[i])) return false;
+    const cmp = await bcryptjs.compare(ip, this.like[i]);
+    if (cmp) return false;
   }
   const hash = await bcryptjs.hash(ip, 10);
   this.like.push(hash);
@@ -105,7 +106,8 @@ ProjectSchema.methods.writeComment = async function (commentId, comment) {
 ProjectSchema.methods.removeComment = async function (commentId, password) {
   for (let i = 0; i < this.comment.length; i++) {
     if (String(this.comment[i]._id) === commentId) {
-      if (!bcryptjs.compare(password, this.comment[i].hashedPassword)) return false;
+      const cmp = await bcryptjs.compare(password, this.comment[i].hashedPassword);
+      if (!cmp) return false;
       this.comment[i].die = true;
       this.comment[i].nickname = '???';
       this.comment[i].content = '???';
@@ -114,7 +116,8 @@ ProjectSchema.methods.removeComment = async function (commentId, password) {
     } else {
       for (let j = 0; j < this.comment[i].reply.length; j++) {
         if (String(this.comment[i].reply[j]._id) === commentId) {
-          if (!bcryptjs.compare(password, this.comment[i].reply[j].hashedPassword)) return false;
+          const cmp = await bcryptjs.compare(password, this.comment[i].reply[j].hashedPassword);
+          if (!cmp) return false;
           this.comment[i].reply[j].die = true;
           this.comment[i].reply[j].nickname = '???';
           this.comment[i].reply[j].content = '???';
@@ -124,7 +127,18 @@ ProjectSchema.methods.removeComment = async function (commentId, password) {
       }
     }
   }
-  return true;
+  return false;
+};
+ProjectSchema.methods.serialize = function () {
+  const data = this.toJSON();
+  for (let i = 0; i < data.comment.length; i++) {
+    const mainComment = data.comment[i];
+    for (let j = -1; j < mainComment.reply.length; j++) {
+      const comment = j < 0 ? mainComment : mainComment.reply[j];
+      delete comment.hashedPassword;
+    }
+  }
+  return data;
 };
 
 const Project = mongoose.model('project', ProjectSchema);
