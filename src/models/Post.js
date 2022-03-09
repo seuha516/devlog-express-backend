@@ -104,8 +104,8 @@ PostSchema.methods.removeComment = async function (commentId, password) {
       const cmp = await bcryptjs.compare(password, this.comment[i].hashedPassword);
       if (!cmp) return false;
       this.comment[i].die = true;
-      this.comment[i].nickname = '???';
-      this.comment[i].content = '???';
+      this.comment[i].nickname = '(알 수 없음)';
+      this.comment[i].content = '삭제된 댓글입니다.';
       sendMail('댓글 삭제', '게시물', this.title, '???', '');
       return true;
     } else {
@@ -114,8 +114,8 @@ PostSchema.methods.removeComment = async function (commentId, password) {
           const cmp = await bcryptjs.compare(password, this.comment[i].reply[j].hashedPassword);
           if (!cmp) return false;
           this.comment[i].reply[j].die = true;
-          this.comment[i].reply[j].nickname = '???';
-          this.comment[i].reply[j].content = '???';
+          this.comment[i].reply[j].nickname = '(알 수 없음)';
+          this.comment[i].reply[j].content = '삭제된 댓글입니다.';
           sendMail('답글 삭제', '게시물', this.title, '???', '');
           return true;
         }

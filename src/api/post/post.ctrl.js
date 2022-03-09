@@ -49,6 +49,16 @@ export const list = async (req, res) => {
     ...(project ? { project: project } : {}),
     ...(series ? { series: series } : {}),
   };
+  const getCommentCount = (comment) => {
+    let count = 0;
+    for (let i = 0; i < comment.length; i++) {
+      if (!comment[i].die) count++;
+      for (let j = 0; j < comment[i].reply.length; j++) {
+        if (!comment[i].reply[j].die) count++;
+      }
+    }
+    return count;
+  };
 
   try {
     const tempPosts = await Post.find(query)
@@ -56,14 +66,16 @@ export const list = async (req, res) => {
       .limit(6)
       .skip((page - 1) * 6)
       .lean()
-      .select('-body -series -project -like -comment')
+      .select('-body -series -project')
       .exec();
     const postCount = await Post.countDocuments(query);
     const posts = series
       ? tempPosts.map((i, idx) => {
-          return { ...i, seriesNumber: sort == -1 ? postCount - (page - 1) * 6 - idx : (page - 1) * 6 + idx + 1 };
+          return { ...i, seriesNumber: sort == -1 ? postCount - (page - 1) * 6 - idx : (page - 1) * 6 + idx + 1, like: undefined, comment: undefined };
         })
-      : tempPosts;
+      : tempPosts.map((i) => {
+          return { ...i, likeCount: i.like.length, commentCount: getCommentCount(i.comment), like: undefined, comment: undefined };
+        });
     const tagData = await Post.find().lean().select('tags').exec();
     let tagList = [];
     for (let i = 0; i < tagData.length; i++) {
