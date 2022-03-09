@@ -69,7 +69,7 @@ export const list = async (req, res) => {
 };
 export const write = async (req, res) => {
   try {
-    const exists = await Project.findByTitle(project.title);
+    const exists = await Project.findByTitle(req.body.title);
     if (exists) return res.status(409).json({ message: '같은 이름의 프로젝트가 존재합니다.' });
     const project = new Project(req.body);
     await project.save();
