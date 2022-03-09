@@ -82,9 +82,7 @@ export const read = async (req, res) => {
   const { id } = req.params;
   try {
     const projectByTitle = await Project.findByTitle(id);
-    if (projectByTitle) {
-      return res.json(projectByTitle);
-    }
+    if (projectByTitle) return res.json(projectByTitle.serialize());
     if (!ObjectId.isValid(id)) return res.status(400).json({ message: '올바르지 않은 데이터 ID입니다.' });
     const project = await Project.findById(id);
     if (!project) return res.status(404).json({ message: '존재하지 않는 프로젝트입니다.' });
