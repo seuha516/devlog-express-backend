@@ -71,7 +71,7 @@ export const list = async (req, res) => {
     const postCount = await Post.countDocuments(query);
     const posts = series
       ? tempPosts.map((i, idx) => {
-          return { ...i, seriesNumber: sort == -1 ? postCount - (page - 1) * 6 - idx : (page - 1) * 6 + idx + 1, like: undefined, comment: undefined };
+          return { ...i, seriesNumber: sort == -1 ? postCount - (page - 1) * 6 - idx : (page - 1) * 6 + idx + 1, like: undefined, comment: undefined, tags: undefined };
         })
       : tempPosts.map((i) => {
           return { ...i, likeCount: i.like.length, commentCount: getCommentCount(i.comment), like: undefined, comment: undefined };
