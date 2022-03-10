@@ -7,6 +7,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import fs from 'fs';
 import api from './src/api/index.js';
+import updateData from './src/lib/updateData.js';
 
 mongoose
   .connect(process.env.MONGO_URL, {
@@ -29,6 +30,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use('/', api);
+// updateData();
 
 const port = process.env.PORT || 4000;
 // app.listen(port, '0.0.0.0', () => console.log(`[TEST] Server (port: ${port})`));
