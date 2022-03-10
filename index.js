@@ -17,11 +17,11 @@ mongoose
   .then(() => console.log('MongoDB connected!'))
   .catch((error) => console.log(error));
 
-// const option = {
-//   ca: fs.readFileSync(`${process.env.SSL_KEY_PATH}fullchain.pem`),
-//   key: fs.readFileSync(`${process.env.SSL_KEY_PATH}privkey.pem`),
-//   cert: fs.readFileSync(`${process.env.SSL_KEY_PATH}cert.pem`),
-// };
+const option = {
+  ca: fs.readFileSync(`${process.env.SSL_KEY_PATH}fullchain.pem`),
+  key: fs.readFileSync(`${process.env.SSL_KEY_PATH}privkey.pem`),
+  cert: fs.readFileSync(`${process.env.SSL_KEY_PATH}cert.pem`),
+};
 
 const app = express();
 app.use(cors({ origin: true, credentials: true }));
@@ -31,7 +31,7 @@ app.use(cookieParser());
 app.use('/', api);
 
 const port = process.env.PORT || 4000;
-app.listen(port, '0.0.0.0', () => console.log(`[TEST] Server (port: ${port})`));
-// https.createServer(option, app).listen(port, () => console.log(`[HTTPS] Server (port: ${port})`));
+// app.listen(port, '0.0.0.0', () => console.log(`[TEST] Server (port: ${port})`));
+https.createServer(option, app).listen(port, () => console.log(`[HTTPS] Server (port: ${port})`));
 
 export default app;
