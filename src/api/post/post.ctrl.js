@@ -143,6 +143,14 @@ export const read = async (req, res) => {
   try {
     const post = await Post.findById(id);
     if (!post) return res.status(404).json({ message: '존재하지 않는 게시물입니다.' });
+
+    // 이미지 주소 변경
+    // let content = post.body;
+    // let newContent = content.replace(/seungha-devlog-server.xyz:4000/g, 'www.server-seungha.shop:4000');
+    // post.body = newContent;
+    // await post.save();
+    //
+
     const prev = await Post.find({ _id: { $lt: id } })
       .sort({ _id: -1 })
       .limit(1)
