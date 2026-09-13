@@ -43,7 +43,11 @@ export const check = async (req, res) => {
   return res.status(204).json();
 };
 export const logout = async (req, res) => {
-  res.cookie('access_token');
+  res.clearCookie('access_token', {
+    secure: true,
+    sameSite: 'none',
+    httpOnly: true,
+  });
   return res.status(204).json();
 };
 export const checkid = async (req, res) => {
