@@ -14,6 +14,7 @@ const jwtMiddleware = async (req, res, next) => {
         maxAge: 1000 * 60 * 60 * 24 * 7,
         secure: true,
         sameSite: 'none',
+        httpOnly: true,
       });
     } else if (decoded.exp - now < 0) {
       return res.status(401).json({ message: '토큰이 만료되었습니다.' });

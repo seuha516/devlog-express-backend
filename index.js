@@ -25,7 +25,8 @@ const option = {
 };
 
 const app = express();
-app.use(cors({ origin: true, credentials: true }));
+const allowedOrigins = (process.env.CLIENT_ORIGIN || 'https://devlog-seungha.netlify.app').split(',');
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());

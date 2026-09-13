@@ -13,6 +13,7 @@ export const register = async (req, res) => {
       maxAge: 1000 * 60 * 60 * 24 * 7,
       secure: true,
       sameSite: 'none',
+      httpOnly: true,
     });
     return res.json(user.serialize());
   } catch (e) {
@@ -31,6 +32,7 @@ export const login = async (req, res) => {
       maxAge: 1000 * 60 * 60 * 24 * 7,
       secure: true,
       sameSite: 'none',
+      httpOnly: true,
     });
     return res.json(user.serialize());
   } catch (e) {
